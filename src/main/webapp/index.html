@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="RemoteMusicPlayer">
+<head>
+  <title>Remote Music Player</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--  use bootstrap stylesheets -->
+  <link rel="stylesheet" href="js/bootstrap-3.3.4-dist/css/bootstrap.min.css">
+  
+  <!--  include angular js and our own app js -->
+  <script type="text/javascript" src="js/angular.min.js"></script>
+  <script type="text/javascript" src="js/rmp_angular.js"> </script>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="jumbotron">
+	<h2>Remote Music Player</h2>
+	<h4>Entertain Me!</h4>
+  </div>
+  
+  <!--  <div class="row"> -->
+  <section ng-controller="TabController">
+    <!--  Tabset headings section is in this <ul> -->
+    <ul class="nav nav-tabs">
+      <li role="presentation" ng-class="{active:isSelectedTab('MusicSourceTab')}"><a href ng-click="selectTab('MusicSourceTab')">Music Source</a></li>
+      <li role="presentation" ng-class="{active:isSelectedTab('SearchTab')}"><a href ng-click="selectTab('SearchTab')">Search</a></li>
+      <li role="presentation" ng-class="{active:isSelectedTab('PlayTab')}"><a href ng-click="selectTab('PlayTab')">Play</a></li>
+    </ul>
+    
+    <!--  Divs corresponding to each tab content -->
+    <div id="MusicSourceTab" ng-show="isTabSelected('MusicSourceTab')" ng-include="'musicSource.html'"></div>
+    <div id="SearchTab" ng-show="isTabSelected('SearchTab')" ng-include="'search.html'"></div>
+    <div id="PlayTab" ng-show="isTabSelected('PlayTab')" ng-include="'play.html'"></div>
+  </section>
+</div>
+<!-- 
+   <div style="display: inline-block;" id=player>
+   	<table border="1px">
+<tr>
+  <td align="center">
+    <input type="image" data-bind="click: play/pause" src="images/pause.gif">
+    <input type="image" data-bind="click: play/stop" src="images/stop.gif">
+    <input type="image" data-bind="click: play/skip" src="images/next.gif">
+  	<input type="image" data-bind="click: play/random" src="images/dice.gif">
+  </td>
+</tr>
+</table>
+     <span id=playList>
+       <table><tr><td>songplay1<tr><td>songplay2</table>
+     </span>
+   </div>
+    -->
+</body>
+</html>

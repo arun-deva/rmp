@@ -1,0 +1,68 @@
+import java.lang.invoke.LambdaForm.Compiled;
+
+import com.sun.org.apache.xalan.internal.xsltc.compiler.Include;
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'war'
+
+sourceCompatibility = 8
+version = '1.0'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Quickstart',
+                   'Implementation-Version': version
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+	
+	providedCompile('javax.servlet:javax.servlet-api:3.1.0')
+	providedCompile('org.glassfish.jersey.core:jersey-server:2.17')
+	providedCompile('javax.enterprise:cdi-api:1.2')
+	providedCompile('javax.ws.rs:javax.ws.rs-api:2.0.1')
+	providedCompile('org.glassfish.jersey.media:jersey-media-json-jackson:2.17')
+	providedCompile('javax.enterprise.concurrent:javax.enterprise.concurrent-api:1.0')
+	
+	compile('org.jaudiotagger:jaudiotagger:2.0.1')
+	compile('net.java.dev.jna:jna:3.0.9')
+	compile('javax.media:jmf:2.1.1e')
+	compile('com.googlecode.soundlibs:mp3spi:1.9.5-1')
+	compile files('E:/Users/dev/javalibs/libxine/libxine-java-jna.jar')
+	
+	runtime('com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.5.3')
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    testCompile('org.jglue.cdi-unit:cdi-unit:3.1.2')
+	testRuntime files('src/main/webapp/WEB-INF')
+}
+
+test {
+    systemProperties 'property': 'value'
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'repos'
+       }
+    }
+}
+
+task deployToTomcat(type: Copy) {
+	from war
+	into "${tomcatHome}/webapps"
+}
+task deployToGlassfish(type: Copy) {
+	from war
+	into "${glassFishDomainHome}/autodeploy"
+}
+deployToTomcat.dependsOn build
+deployToTomcat.mustRunAfter build
+
+deployToGlassfish.dependsOn build
+deployToGlassfish.mustRunAfter build

@@ -1,0 +1,14 @@
+  	<div id=musicSource class="col-sm-12" ng-controller="musicSourceController">
+  	    <!--  Documentation for below <select>
+  	         "musicSrc as musicSrc.location 
+  	              => musicSrc represents the selected value that will be placed in ng-model when user changes selection
+  	              => musicSrc.location represents label it will be displayed as 
+  	          "track by musicSrc.location 
+  	              => this refers to the value attribute of the <option> generated
+  	              => When selection changes, the track by expression will be applied to each item in list, and also to the selected object, and compared.
+  	                 i.e. for each item in potentialMusicSources, the ".location" will be compared to currentMusicSource.location
+  	     -->
+  	    Music Source: <select ng-options="musicSrc as musicSrc.location for musicSrc in potentialMusicSources track by musicSrc.location" ng-model="currentMusicSource"></select> You selected: {{currentMusicSource}}
+  		<button ng-click="updateMusicSource()">Update</button>
+		Update Status: {{status}}
+  	</div>

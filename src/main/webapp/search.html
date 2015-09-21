@@ -1,0 +1,33 @@
+    <div id=search ng-controller="SearchController" class="col-sm-4" style="background-color:lavender;">
+    	<div class="row">
+    		<div class="col-sm-12">
+				<input type="text" ng-model="searchText" name="search">
+				<button ng-click="search()">Go</button>
+			</div>
+		</div>
+		<div class="row">
+    		<div id=searchResults class="col-sm-12" style="background-color:lavenderblush;">
+      			<table class="table table-striped">
+    				<thead>
+      					<tr>
+      					    <th></th>
+        					<th>Title</th>
+        					<th>File Name</th>
+      					</tr>
+    				</thead>
+    				<tbody ng-repeat="result in searchResults">
+      				<tr>
+      				    <td>
+      				    <span ng-switch on="isAdded($index)">
+      				      <img ng-switch-when="true" src='images/tick.jpg'>
+      				      <img ng-switch-default src='images/add.gif' ng-click="addToPlayList($index)">
+      				    </span>
+                        </td>
+        				<td>{{result.songInfo.title}}</td>
+        				<td>{{result.fileName}}</td>
+      				</tr>
+    				</tbody>
+  				</table>
+    		</div>    
+    	</div>
+  	</div>

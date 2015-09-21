@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Remote Music Player</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="js/bootstrap-3.3.4-dist/css/bootstrap.min.css">
+	<!--  include knockout databinding and jquery for ajax -->
+	<script type="text/javascript" src="js/knockout-3.3.0.js"> </script>
+	<script type="text/javascript" src="js/jquery-2.1.4.min.js"> </script>
+	<script src="js/bootstrap-3.3.4-dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/musicSourceModel.js"> </script>
+	<script type="text/javascript" src="js/searchModel.js"> </script>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="jumbotron">
+	<h2>Remote Music Player</h2>
+	<h4>Entertain Me!</h4>
+  </div>
+  <div class="row">
+  	<div id=musicSource class="col-sm-12">
+  		Music Source: <select data-bind="options: potentialMusicSources, optionsText: 'location', optionsValue: 'location', value: currentMusicSource.location"></select> 
+		<button data-bind="click: updateMusicSource">Update</button>
+		<span data-bind="text: updateStatus"></span>
+  	</div>
+  </div>
+  
+  <!--  <div class="row"> -->
+  <ul class="nav nav-tabs">
+    <li role="presentation" class="active"><a data-toggle="tab" href="#SearchTab">Search</a></li>
+    <li role="presentation"><a data-toggle="tab" href="#PlayTab">Play</a></li>
+  </ul>
+  <div class="tab-content">
+  <div id="SearchTab" class="tab-pane fade in active">
+    <div id=search class="col-sm-4" style="background-color:lavender;">
+    	<div class="row">
+    		<div class="col-sm-12">
+				<input type="text" data-bind="textInput: searchText" name="search">
+				<button data-bind="click: search">Go</button>
+			</div>
+		</div>
+		<div class="row">
+    		<div id=searchResults class="col-sm-12" style="background-color:lavenderblush;">
+      			<table class="table table-striped">
+    				<thead>
+      					<tr>
+        					<th>Search Results</th>
+      					</tr>
+    				</thead>
+    				<tbody data-bind="foreach: searchResults">
+      				<tr>
+        				<td data-bind="text: songInfo.title"></td>
+      				</tr>
+    				</tbody>
+  				</table>
+    		</div>    
+    	</div>
+  	</div>
+  </div>
+  <div id="PlayTab" class="tab-pane fade">
+  <div id=play class="col-sm-8" style="background-color:lavender;">
+    <div class="row">
+       <div class="col-sm-12" id="player">
+         <input type="image" data-bind="click: play/pause" src="images/pause.gif">
+         <input type="image" data-bind="click: play/stop" src="images/stop.gif">
+         <input type="image" data-bind="click: play/skip" src="images/next.gif">
+   	     <input type="image" data-bind="click: play/random" src="images/dice.gif">
+       </div>
+    </div>
+    <div class="row">
+    	<div id=playlist class="col-sm-12" style="background-color:lavenderblush;">
+      		<table class="table table-striped">
+    			<thead>
+      				<tr>
+        				<th>Play List</th>
+      				</tr>
+    			</thead>
+    			<tbody data-bind="foreach: searchResults">
+      				<tr>
+            			<td data-bind="text: songInfo.title"></td>
+        			</tr>
+    			</tbody>
+  			</table>
+    	</div>
+    </div>
+  </div>
+  </div>
+  </div> <!--  end tab content -->
+  <!--  </div> -->
+</div>
+<!-- 
+   <div style="display: inline-block;" id=player>
+   	<table border="1px">
+<tr>
+  <td align="center">
+    <input type="image" data-bind="click: play/pause" src="images/pause.gif">
+    <input type="image" data-bind="click: play/stop" src="images/stop.gif">
+    <input type="image" data-bind="click: play/skip" src="images/next.gif">
+  	<input type="image" data-bind="click: play/random" src="images/dice.gif">
+  </td>
+</tr>
+</table>
+     <span id=playList>
+       <table><tr><td>songplay1<tr><td>songplay2</table>
+     </span>
+   </div>
+    -->
+</body>
+</html>

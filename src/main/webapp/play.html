@@ -1,0 +1,81 @@
+  <div id=play ng-controller="PlayController" class="col-sm-8" style="background-color:lavender;">
+    <div class="row">
+       <div class="col-sm-12" id="player">
+         <img ng-click="pause()" src="images/pause.gif">
+         <img ng-click="stop()" src="images/stop.gif">
+         <img ng-click="skip()" src="images/next.gif">
+   	     <img ng-click="random()" src="images/dice.gif">
+       </div>
+    </div>
+
+    <div class="row">
+    	<div id=playlist class="col-sm-12">
+     			<table class="table table-striped">
+    				<thead>
+      					<tr>
+      					    <th></th>
+        					<th>Title</th>
+        					<th>Album</th>
+        					<th>Artist</th>        					        					
+        					<th>File Name</th>
+      					</tr>
+    				</thead>     			
+     			    <tbody ng-show="playListStatus.nowPlayingSong">
+      				<tr>
+      				    <td>
+      				      <img src='images/musicnote.gif'>
+      				      <div ng-show="isEditable(playListStatus.nowPlayingSong)">
+      				        <img ng-hide="isCurrentlyEditing(playListStatus.nowPlayingSong.key)" src='images/edit.jpg' ng-click="editMetaData(playListStatus.nowPlayingSong.key)">
+      				        <div ng-show="isCurrentlyEditing(playListStatus.nowPlayingSong.key)">
+      				      	  <img src='images/tick.jpg' ng-click="updateMetaData(playListStatus.nowPlayingSong)">
+      				      	  <img src='images/cancel.jpg' ng-click="cancelEditMetaData()">
+      				        </div>
+      				      </div>
+                        </td>
+        				<td>
+	        				<div ng-hide="isCurrentlyEditing(playListStatus.nowPlayingSong.key)">{{playListStatus.nowPlayingSong.songInfo.title}}</div>
+	        				<div ng-show="isCurrentlyEditing(playListStatus.nowPlayingSong.key)"><input type="text" ng-model="playListStatus.nowPlayingSong.songInfo.title" name="nowPlayingTitle"></div>
+        				</td>
+        				<td>
+        				    <div ng-hide="isCurrentlyEditing(playListStatus.nowPlayingSong.key)">{{playListStatus.nowPlayingSong.songInfo.album}}</div>
+        				    <div ng-show="isCurrentlyEditing(playListStatus.nowPlayingSong.key)"><input type="text" ng-model="playListStatus.nowPlayingSong.songInfo.album" name="nowPlayingAlbum"></div>
+        				</td>
+        				<td>
+        				    <div ng-hide="isCurrentlyEditing(playListStatus.nowPlayingSong.key)">{{playListStatus.nowPlayingSong.songInfo.artist}}</div>
+        				    <div ng-show="isCurrentlyEditing(playListStatus.nowPlayingSong.key)"><input type="text" ng-model="playListStatus.nowPlayingSong.songInfo.artist" name="nowPlayingArtist"></div>
+        				</td>
+        				<td>{{playListStatus.nowPlayingSong.fileName}}</td>
+      				</tr>
+      				
+    				</tbody>
+    				<tbody ng-repeat="song in playList">
+      				<tr>
+      				    <td>
+      				      <img src='images/delete.gif' ng-click="removeFromPlayList($index)">
+      				      <div ng-show="isEditable(song)">
+      				        <img ng-hide="isCurrentlyEditing(song.key)" src='images/edit.jpg' ng-click="editMetaData(song.key)">
+      				        <div ng-show="isCurrentlyEditing(song.key)">
+      				      	  <img src='images/tick.jpg' ng-click="updateMetaData(song)">
+      				      	  <img src='images/cancel.jpg' ng-click="cancelEditMetaData()">
+      				        </div>
+      				      </div>
+                        </td>
+        				<td>
+	        				<div ng-hide="isCurrentlyEditing(song.key)">{{song.songInfo.title}}</div>
+	        				<div ng-show="isCurrentlyEditing(song.key)"><input type="text" ng-model="song.songInfo.title" name="title{{$index}}"></div>
+        				</td>
+        				<td>
+        				    <div ng-hide="isCurrentlyEditing(song.key)">{{song.songInfo.album}}</div>
+        				    <div ng-show="isCurrentlyEditing(song.key)"><input type="text" ng-model="song.songInfo.album" name="album{{$index}}"></div>
+        				</td>
+        				<td>
+        				    <div ng-hide="isCurrentlyEditing(song.key)">{{song.songInfo.artist}}</div>
+        				    <div ng-show="isCurrentlyEditing(song.key)"><input type="text" ng-model="song.songInfo.artist" name="artist{{$index}}"></div>
+        				</td>
+        				<td>{{song.fileName}}</td>
+      				</tr>
+    				</tbody>
+  				</table>
+    	</div>
+    </div>
+  </div>

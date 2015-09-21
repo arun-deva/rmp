@@ -1,0 +1,99 @@
+<html>
+<head>
+<style type="text/css">
+#musicSource {
+    width: 100%;
+    height: 30px;
+    border:solid #460;
+    display: inline-block;
+}
+#search {
+    width: 40%;
+    background: #999;
+    display: inline-block;
+}
+#player {
+width: 50%;
+    border:thick solid #960;
+    display: inline-block;
+}
+#container {
+    width: 100%;
+    height: 100%;
+    border:thick dotted #060;
+    display: inline-block;
+}
+</style>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Remote Music Player</title>
+
+<!--  include knockout databinding and jquery for ajax -->
+<script type="text/javascript" src="js/knockout-3.3.0.js"> </script>
+<script type="text/javascript" src="js/jquery-2.1.4.min.js"> </script>
+<script type="text/javascript" src="js/musicSourceModel.js"> </script>
+<script type="text/javascript" src="js/searchModel.js"> </script>
+
+</head>
+<body>
+<h2>Remote Music Player</h2>
+<h4>Entertain Me!</h4>
+<div id=container>
+   <div id=musicSource>
+Music Source: <select data-bind="options: potentialMusicSources, optionsText: 'location', optionsValue: 'location', value: currentMusicSource.location"></select> 
+<button data-bind="click: updateMusicSource">Update</button>
+<span data-bind="text: updateStatus"></span>
+   </div>
+   <div id=search>            
+            <input type="text" name="search">
+            <button data-bind="click: search">Go</button>
+      <span id=searchResults>
+         <table><tr><td>song1<tr><td>song2</table>
+      </span>
+    </div>
+   <div style="display: inline-block;" id=player>
+   	<table border="1px">
+<tr>
+  <td align="center">
+    <input type="image" data-bind="click: play/pause" src="images/pause.gif">
+    <input type="image" data-bind="click: play/stop" src="images/stop.gif">
+    <input type="image" data-bind="click: play/skip" src="images/next.gif">
+  	<input type="image" data-bind="click: play/random" src="images/dice.gif">
+  </td>
+</tr>
+</table>
+     <span id=playList>
+       <table><tr><td>songplay1<tr><td>songplay2</table>
+     </span>
+   </div>
+</div>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Remote Music Player</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="js/bootstrap-3.3.4-dist/css/bootstrap.min.css">
+	<!--  include knockout databinding and jquery for ajax -->
+	<script type="text/javascript" src="js/knockout-3.3.0.js"> </script>
+	<script type="text/javascript" src="js/jquery-2.1.4.min.js"> </script>
+	<script src="js/bootstrap-3.3.4-dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/musicSourceModel.js"> </script>
+	<script type="text/javascript" src="js/searchModel.js"> </script>
+</head>
+<body>
+
+<div class="container-fluid">
+  <h1>Hello World!</h1>
+  <p>Resize the browser window to see the effect.</p>
+  <div class="row">
+    <div class="col-sm-4" style="background-color:lavender;">.col-sm-6</div>
+    <div class="col-sm-8" style="background-color:lavenderblush;">.col-sm-6</div>
+  </div>
+</div>
+
+</body>
+</html>

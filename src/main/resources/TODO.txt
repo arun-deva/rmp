@@ -1,0 +1,38 @@
+Pressing X during edit does not revert values - only reverts when next refresh from server happens
+Search results only allow adding a song once
+make refresh polling smarter
+DONE Edit now playing song refreshes in middle of edit
+DONE WAV edit support - none, so don't show button
+DONE Edit boxes for all fields
+	
+DONE Edit for now playing should only be reset if song changes
+DONE Edit icon should change to save icon when edit clicked. make iseditable based on song key instead of index
+DONE write updatemetadata()
+
+
+
+DONE:
+Separated audio stuff and playing of single file into JavaSoundPlayer - need to make JavaMediaPlayer use this
+ => Note: JavaMediaPlayer needs to implement the new PlayCompletedLIstener interface and rename its own inner class PlayCompletedListener to something else
+
+Refactoring Notes-
+
+Added PlayList which is used by JavaMediaPlayer and PlayListManager
+What should handle the PLAY_STARTED event?
+Where should nowPlaying be?
+Do we still need PlayListManager? Should everything be in PlayList?
+Done refactoring JavaMediaPLayer to use container managed thread for all play events
+
+
+
+=====OLD TODO=============
+4. Don't allow playing until valid music source is set?
+
+-----------
+5. jQuery/true REST resources with JSON responses
+6. Genre filtering
+
+
+
+
+BUGS:

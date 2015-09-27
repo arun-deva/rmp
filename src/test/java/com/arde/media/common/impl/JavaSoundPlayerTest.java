@@ -3,6 +3,8 @@ package com.arde.media.common.impl;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
@@ -18,23 +20,16 @@ public class JavaSoundPlayerTest {
 	@Test
 	public void testPlayCompletedNaturally() throws InterruptedException {
 		final AtomicBoolean playCompletedCalled = new AtomicBoolean(false);
-
+		CountDownLatch waitForPlayComplete = new CountDownLatch(1);
 		final JavaSoundPlayer p = new JavaSoundPlayer(
 				f -> {
 					playCompletedCalled.set(true);
 					System.out.println("runPlayCompletedNaturally: playCompleted listener called");
+					waitForPlayComplete.countDown();
 					});
-		
-		Thread myThread = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				p.play(myShortFile);
-			}
-			
-		});
-		myThread.start();
-		myThread.join(6000);
+		p.play(myShortFile);
+		//use a countdown latch to wait until any threads spawned by the player are completed.
+		waitForPlayComplete.await(6, TimeUnit.SECONDS);
 		assertTrue("Expected playCompleted to be called for natural end of play!", playCompletedCalled.get());
 	}
 	

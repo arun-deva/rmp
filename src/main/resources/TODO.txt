@@ -1,3 +1,7 @@
+If file format can't be played (e.g. flac), JavaSoundPlayer.doPlay() swallows the exception, and so JavaMediaPlayer.playNextFile() 
+still notifies that play started. JavaMediaPlayer.playNextFile() should use the playCompletedListener to also listen for play actually started,
+and only then do notification. JavaSoundPlayer.play() should capture the failure, and maybe we can have a PLAY_FAILED state
+
 Pressing X during edit does not revert values - only reverts when next refresh from server happens
 Search results only allow adding a song once
 make refresh polling smarter

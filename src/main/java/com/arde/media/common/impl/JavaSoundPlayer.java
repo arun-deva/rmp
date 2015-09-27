@@ -128,6 +128,7 @@ public class JavaSoundPlayer implements LineListener {
 	}
 
 	public void resume() {
+		if (line == null) return;
 		if (!line.isRunning()) line.start();
 	}
 
@@ -136,11 +137,13 @@ public class JavaSoundPlayer implements LineListener {
 	}
 
 	public void stop() {
+		if (line == null) return;
 		stopLine();
 		line.close();
 	}
 	
 	private void stopLine() {
+		if (line == null) return;
 		if (line.isRunning()) {
 			lineStoppedManually = true;
 			line.stop();

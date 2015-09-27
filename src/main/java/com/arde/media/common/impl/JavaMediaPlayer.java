@@ -24,7 +24,6 @@ public class JavaMediaPlayer implements IMediaPlayer {
 	private PlayerState playerState = PlayerState.IDLE;
 	
 	@Resource
-//	@Inject
 	/**
 	 * The resource annotation is enough for this. The only reason the Inject annotation is added is because
 	 * of unit tests - CDIRunner does not work for injecting resources, but adding hte Inject makes it work

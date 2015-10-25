@@ -18,10 +18,11 @@ import com.arde.media.rmp.IPlayList;
 import com.arde.media.rmp.IPlaylistManager;
 import com.arde.media.rmp.MediaPlayerQualifier;
 import com.arde.media.rmp.PlayerEventQualifier;
+import com.arde.media.rmp.RmpSettings;
 
 @ApplicationScoped
 public class PlayListManager implements IPlaylistManager {
-	@Inject @MediaPlayerQualifier("Java")
+	@Inject @MediaPlayerQualifier(RmpSettings.DEFAULT_MEDIA_PLAYER)
 	IMediaPlayer playerBean;
 	
 	@Inject

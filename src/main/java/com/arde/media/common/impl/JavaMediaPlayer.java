@@ -9,11 +9,13 @@ import javax.annotation.Resource;
 import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import com.arde.media.common.IMediaPlayer;
 import com.arde.media.common.IMediaQueue;
 import com.arde.media.common.Song;
+import com.arde.media.common.SupportedMediaFilesFilter;
 import com.arde.media.rmp.MediaPlayerQualifier;
 import com.arde.media.rmp.impl.PlayerEventQualifierFactory;
 
@@ -116,12 +118,15 @@ public class JavaMediaPlayer implements IMediaPlayer {
 	}
 
 	@Override
+	@Produces @SupportedMediaFilesFilter
 	public FileFilter getSupportedFileFilter() {
 		return new FileFilter() {
 			@Override
 			public boolean accept(File f) {
 				String fName = f.getName().toUpperCase(); 
-				return fName.endsWith(".MP3") || fName.endsWith(".WAV") || fName.endsWith(".FLAC");
+				return (!f.isDirectory() && 
+						f.canRead() && 
+						(fName.endsWith(".MP3") || fName.endsWith(".WAV") || fName.endsWith(".FLAC")));
 			}
 			
 		};

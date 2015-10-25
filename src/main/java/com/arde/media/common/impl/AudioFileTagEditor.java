@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -23,10 +25,14 @@ import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTag;
 import com.arde.media.common.IAudioFileTagEditor;
 import com.arde.media.common.Song;
 import com.arde.media.common.SongInfo;
+import com.arde.media.rmp.MetadataChangedEventQualifier;
 
 @ApplicationScoped
 public class AudioFileTagEditor implements IAudioFileTagEditor {
-
+	@Inject
+	@MetadataChangedEventQualifier
+	private Event<Song> songMetaDataChangedEvt;
+	
 	@Override
 	public void setArtist(File mediaFile, String artist) throws Exception {
 		AudioFile f = AudioFileIO.read(mediaFile);
@@ -74,16 +80,21 @@ public class AudioFileTagEditor implements IAudioFileTagEditor {
 	}
 
 	@Override
-	public SongInfo readSongInfo(File mediaFile) throws Exception {
+	public SongInfo readSongInfo(File mediaFile) throws IOException {
 		SongInfo info = new SongInfo();
-		AudioFile f = AudioFileIO.read(mediaFile);
-		Tag tag = f.getTag();
-		info.setTitle(tag.getFirst(FieldKey.TITLE));
-		info.setArtist(tag.getFirst(FieldKey.ARTIST));
-		info.setAlbum(tag.getFirst(FieldKey.ALBUM));
-		info.setRating(getRating(tag));
-		info.setEditable(isTagEditable(f));
-		return info;
+		try {
+			AudioFile f = AudioFileIO.read(mediaFile);
+			Tag tag = f.getTag();
+			info.setTitle(tag.getFirst(FieldKey.TITLE));
+			info.setArtist(tag.getFirst(FieldKey.ARTIST));
+			info.setAlbum(tag.getFirst(FieldKey.ALBUM));
+			info.setRating(getRating(tag));
+			info.setEditable(isTagEditable(f));
+			return info;
+		} catch (InvalidAudioFrameException | CannotReadException | TagException | ReadOnlyFileException e) {
+			throw new IOException("Tag reader failed to read audio file", e);
+		}
+		
 	}
 
 	private boolean isTagEditable(AudioFile f) {
@@ -110,8 +121,9 @@ public class AudioFileTagEditor implements IAudioFileTagEditor {
 	}
 
 	@Override
-	public void writeSongInfo(File mediaFile, SongInfo updatedSongInfo) throws Exception {
-		AudioFile f = AudioFileIO.read(mediaFile);
+	public void writeSongInfo(Song song) throws Exception {
+		SongInfo updatedSongInfo = song.getSongInfo();
+		AudioFile f = AudioFileIO.read(song.getFile());
 		Tag tag = f.getTag();
 		
 		System.out.println("Current Artist: " + tag.getFirst(FieldKey.ARTIST));
@@ -120,6 +132,7 @@ public class AudioFileTagEditor implements IAudioFileTagEditor {
 		tag.setField(FieldKey.ALBUM, updatedSongInfo.getAlbum());
 		setRating(tag, updatedSongInfo.getRating());
 		f.commit();
+		songMetaDataChangedEvt.fire(song);
 	}
 	
 	private void setRating(Tag tag, int rating) throws Exception {

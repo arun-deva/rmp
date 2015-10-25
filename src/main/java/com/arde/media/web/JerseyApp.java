@@ -8,7 +8,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 @ApplicationPath("/rest")
 public class JerseyApp extends ResourceConfig {
     public JerseyApp() {
-        packages("com.arde.media.web");
+        packages("com.arde.media.web", "com.arde.media.web.exceptionmappers");
         register(JacksonFeature.class);
     }
 }

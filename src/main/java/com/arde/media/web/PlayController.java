@@ -1,5 +1,6 @@
 package com.arde.media.web;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -15,6 +16,8 @@ import javax.ws.rs.QueryParam;
 import com.arde.media.common.Song;
 import com.arde.media.rmp.IMediaSearch;
 import com.arde.media.rmp.IPlaylistManager;
+import com.arde.media.rmp.MediaSearchQualifier;
+import com.arde.media.rmp.MediaSearchType;
 import com.arde.media.rmp.impl.PlayListStatus;
 
 @Path("play")
@@ -24,14 +27,14 @@ public class PlayController {
 	@Inject
 	private IPlaylistManager playListMgr;
 	
-	@Inject
+	@Inject @MediaSearchQualifier(MediaSearchType.ELASTICSEARCH)
 	private IMediaSearch searchBean;
 	
 	//specifying request mapping at method level
 	//that is relative path starting at parent class mapping
 	//(ie) this request mapping is actually "play/start"
 	@POST @Path("add")
-	public void addSong(@QueryParam("key") String key) {
+	public void addSong(@QueryParam("key") String key) throws IOException {
 		Song s = searchBean.findSongByKey(key);
 		if (s != null) {
 			playListMgr.addSong(s);

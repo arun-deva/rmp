@@ -49,6 +49,7 @@ var searchCtrl = rmpApp.controller('SearchController',  ['$scope', '$http', func
     $scope.addedSongs = {};
 	$scope.search = 
       function() {
+		$scope.status = ""; //reset status
 		var searchReq = {
 				  method: "GET",
 				  url: "rest/search",
@@ -61,7 +62,7 @@ var searchCtrl = rmpApp.controller('SearchController',  ['$scope', '$http', func
         	})
           .error(
             function(data, status, headers, config) {
-            	$scope.status="error! " + status;
+            	$scope.status=data.message;
             });
       }
 	
@@ -97,7 +98,6 @@ var playCtrl = rmpApp.controller('PlayController',  ['$scope', '$http', '$interv
 	$scope.playListStatus = {
 		"nowPlayingChangedMillis" : 0,
 		"playListChangedMillis" : 0,
-		"nowPlayingSong" : {}
 	};
 	$scope.editingSongKey = "";
 	
@@ -117,6 +117,8 @@ var playCtrl = rmpApp.controller('PlayController',  ['$scope', '$http', '$interv
 		return (key == $scope.editingSongKey);
 	}
 	$scope.isEditable = function(song) {
+		if (typeof song == 'undefined') return false;
+		if (typeof song.songInfo == 'undefined') return false;
 		return song.songInfo.editable;
 	}
 	$scope.editMetaData = function(key) {

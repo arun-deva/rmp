@@ -7,40 +7,50 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown=true) //to ignore filename during deserialization
 public class Song {
-	@JsonIgnore
-	//Don't unmarshall file
-	private File file;
-	private String key;
 	private SongInfo songInfo;
+	private String key;
 	
 	//empty constructor for Jackson to use
 	public Song() {
 		
 	}
-	public Song(String key, File f) {
-		this.key = key;
-		this.file = f;
+	public Song(File f) {
+		key = f.getAbsolutePath();
 	}
 
+	public Song(String key) {
+		if (!isKeyValid(key)) {
+			throw new IllegalArgumentException("Invalid key for song:" + key);
+		}
+		this.key = key;
+	}
 	public String getKey() {
 		return key;
 	}
 
-	public void setFile(File file) {
-		this.file = file;
+	
+	/**
+	 * @param key the key to set
+	 */
+	public void setKey(String key) {
+		this.key = key;
 	}
-
 	public File getFile() {
-		return file;
+		return new File(key);
 	}
 
 	public String getFileName() {
-		return file.getName();
+		return getFile().getName();
+	}
+	
+	
+	private boolean isKeyValid(String key) {
+		return new File(key).canRead();
 	}
 	
 	public boolean equals(Object o) {
 		Song s = (Song) o;
-		return (s != null && s.getKey().equals(key));
+		return (s != null && s.getKey().equals(this.getKey()));
 	}
 
 	public void setSongInfo(SongInfo songInfo) {
@@ -56,6 +66,6 @@ public class Song {
 	 */
 	@Override
 	public String toString() {
-		return "Song [file=" + file.getName() + "]";
+		return "Song [file=" + getFileName() + "]";
 	}
 }

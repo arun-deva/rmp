@@ -1,8 +1,12 @@
-package com.arde.media.common.impl;
+package com.arde.media.rmp.impl;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.inject.Inject;
@@ -16,6 +20,7 @@ import org.junit.runner.RunWith;
 import com.arde.media.common.IMediaPlayer;
 import com.arde.media.common.Song;
 import com.arde.media.common.impl.JavaMediaPlayer;
+import com.arde.media.common.impl.TestManagedThreadFactory;
 import com.arde.media.musicsource.MusicSourceManager;
 import com.arde.media.rmp.IMediaSearch;
 import com.arde.media.rmp.impl.FileMediaSearch;
@@ -23,7 +28,7 @@ import com.arde.media.rmp.impl.FileMediaSearch;
 @RunWith(CdiRunner.class)
 @AdditionalPackages({FileMediaSearch.class, IMediaSearch.class, JavaMediaPlayer.class, TestManagedThreadFactory.class})
 
-public class MediaSearchTest {
+public class FileMediaSearchTest {
 	private static final String ROOT_LOCATION = "E:\\Users\\dev\\Music";
 	
 	@Inject
@@ -41,7 +46,7 @@ public class MediaSearchTest {
 			System.out.println(s.getSongInfo().getTitle());
 		}
 
-		File songFile = srch.getSongFileByKey(hits.iterator().next().getKey());
+		File songFile = hits.iterator().next().getFile();
 		Assert.assertNotNull(songFile);
 		Assert.assertEquals("KaattuKuyilu.mp3", songFile.getName());
 	}
@@ -49,6 +54,7 @@ public class MediaSearchTest {
 	public void testRandomMediaSearch() throws Exception {
 		IMediaSearch srch = getFileMediaSearch();
 		Collection<Song> hits = srch.findRandomSongs(10);
+		Assert.assertEquals(10, hits.size());
 		//assertTrue("Ahaya".matches("Aha"));
 		
 		for(Song s : hits) {
@@ -58,13 +64,49 @@ public class MediaSearchTest {
 
 	private IMediaSearch getFileMediaSearch() throws Exception {
 		
-		((FileMediaSearch) srch).setRootLocation(ROOT_LOCATION);
+		((FileMediaSearch) srch).setIndexingFuture(getMockIndexingFuture());
 //		Field mediaPlayerFld = srch.getClass().getDeclaredField("mediaPlayer");
 //		mediaPlayerFld.setAccessible(true);
 //		mediaPlayerFld.set(srch, getJavaMediaPlayer());
 //		srch.setFileFilter(getJavaMediaPlayer().getSupportedFileFilter());
 //		srch.setSongInfoEditor(new AudioFileTagEditor());
 		return srch;
+	}
+	private Future<FileMediaIndexedEvent> getMockIndexingFuture() {
+		return new Future<FileMediaIndexedEvent>() {
+
+			private FileMediaIndexedEvent myevent = new FileMediaIndexedEvent(ROOT_LOCATION, 15);
+
+			@Override
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public boolean isCancelled() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public boolean isDone() {
+				return true;
+			}
+
+			@Override
+			public FileMediaIndexedEvent get() throws InterruptedException,
+					ExecutionException {
+				return myevent;
+			}
+
+			@Override
+			public FileMediaIndexedEvent get(long timeout, TimeUnit unit)
+					throws InterruptedException, ExecutionException,
+					TimeoutException {
+				return myevent;
+			}
+		};
 	}
 	@Test
 	public void testPotentialMusicSources() throws IOException {

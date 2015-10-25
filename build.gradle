@@ -33,6 +33,7 @@ dependencies {
 	compile('net.java.dev.jna:jna:3.0.9')
 	compile('javax.media:jmf:2.1.1e')
 	compile('com.googlecode.soundlibs:mp3spi:1.9.5-1')
+	compile('org.elasticsearch:elasticsearch:1.7.2')
 	compile files('E:/Users/dev/javalibs/libxine/libxine-java-jna.jar')
 	
 	runtime('com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.5.3')

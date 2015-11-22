@@ -14,10 +14,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import com.arde.media.common.Song;
-import com.arde.media.rmp.IMediaSearch;
+import com.arde.media.musicsource.search.IMediaSearch;
+import com.arde.media.musicsource.search.MediaSearchQualifier;
+import com.arde.media.musicsource.search.MediaSearchType;
 import com.arde.media.rmp.IPlaylistManager;
-import com.arde.media.rmp.MediaSearchQualifier;
-import com.arde.media.rmp.MediaSearchType;
 import com.arde.media.rmp.impl.PlayListStatus;
 
 @Path("play")

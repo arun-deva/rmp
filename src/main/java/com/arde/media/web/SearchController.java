@@ -10,9 +10,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
 import com.arde.media.common.Song;
-import com.arde.media.rmp.IMediaSearch;
-import com.arde.media.rmp.MediaSearchQualifier;
-import com.arde.media.rmp.MediaSearchType;
+import com.arde.media.musicsource.search.IMediaSearch;
+import com.arde.media.musicsource.search.MediaSearchQualifier;
+import com.arde.media.musicsource.search.MediaSearchType;
 
 @Path("search")
 public class SearchController {

@@ -15,8 +15,8 @@ import javax.ws.rs.core.MediaType;
 import com.arde.media.common.IAudioFileTagEditor;
 import com.arde.media.common.Song;
 import com.arde.media.common.SongInfo;
-import com.arde.media.rmp.IMediaSearch;
-import com.arde.media.rmp.MediaSearchQualifier;
+import com.arde.media.musicsource.search.IMediaSearch;
+import com.arde.media.musicsource.search.MediaSearchQualifier;
 import com.arde.media.rmp.MetadataChangedEventQualifier;
 
 @Path("tagEdit")

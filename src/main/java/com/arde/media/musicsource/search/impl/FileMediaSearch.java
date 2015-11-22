@@ -1,4 +1,4 @@
-package com.arde.media.rmp.impl;
+package com.arde.media.musicsource.search.impl;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -25,16 +25,16 @@ import com.arde.media.common.IAudioFileTagEditor;
 import com.arde.media.common.IMediaPlayer;
 import com.arde.media.common.Song;
 import com.arde.media.common.SupportedMediaFilesFilter;
-import com.arde.media.rmp.IMediaSearch;
+import com.arde.media.musicsource.IMusicSourceManager;
+import com.arde.media.musicsource.search.IMediaSearch;
+import com.arde.media.musicsource.search.MediaSearchQualifier;
+import com.arde.media.musicsource.search.MediaSearchType;
+import com.arde.media.musicsource.search.MusicSourceIndexed;
 import com.arde.media.rmp.MediaPlayerQualifier;
-import com.arde.media.rmp.MediaSearchQualifier;
-import com.arde.media.rmp.MediaSearchType;
 
 @ApplicationScoped
 @MediaSearchQualifier(MediaSearchType.FILE)
 public class FileMediaSearch implements IMediaSearch {
-	private long numFiles;
-	
 	@Inject
 	private IAudioFileTagEditor songInfoEditor;
 	
@@ -42,8 +42,8 @@ public class FileMediaSearch implements IMediaSearch {
 	@SupportedMediaFilesFilter
 	private FileFilter supportedFilesFilter;
 	
-	private String rootLocation;
-	private Future<FileMediaIndexedEvent> indexingFuture;
+	@Inject
+	IMusicSourceManager musicSrcMgr;
 	
 	/**
 	 * For unit test use only
@@ -52,22 +52,11 @@ public class FileMediaSearch implements IMediaSearch {
 	void setSupportedFilesFilter(FileFilter supportedFilesFilter) {
 		this.supportedFilesFilter = supportedFilesFilter;
 	}
-
-	/**
-	 * For unit test use only
-	 * @param indexingFuture the indexingFuture to set
-	 */
-	void setIndexingFuture(Future<FileMediaIndexedEvent> indexingFuture) {
-		this.indexingFuture = indexingFuture;
-	}
-
-	final private AtomicBoolean indexReady = new AtomicBoolean(false);
 	
 	@Override
 	public List<Song> findSongs(String regex) {
-		System.out.println("Root Location:" + rootLocation);
-		waitForIndexReady();
-		File rootDir = new File(rootLocation);
+		musicSrcMgr.waitForMusicSourceReady();
+		File rootDir = new File(musicSrcMgr.getMusicSource().getLocation());
 		final String finalRegEx = regex.toUpperCase();
 		FileFilter srchFilter = new FileFilter() {
 			@Override
@@ -127,31 +116,17 @@ public class FileMediaSearch implements IMediaSearch {
 		s.setSongInfo(songInfoEditor.readSongInfo(s.getFile()));
 		return s;
 	}
-	
-	/**
-	 * This will be called when Future<FileMediaIndexedEvent> is fired, representing the fact that music source has changed,
-	 * and new music source is being indexed.
-	 * @param indexedEvent
-	 */
-	public void fileMediaIndexingStarted(@Observes Future<FileMediaIndexedEvent> indexingFuture) {
-		indexReady.compareAndSet(true, false);
-		this.indexingFuture = indexingFuture;
-	}
-
-	public String getRootLocation() {
-		return rootLocation;
-	}
 
 	@Override
 	public Collection<Song> findRandomSongs(int howMany) {
-		waitForIndexReady();
+		musicSrcMgr.waitForMusicSourceReady();
 		final Collection<Song> songs = new HashSet<Song>();
 		long r;
 		final SortedSet<Long> rands = new TreeSet<Long>();
 		//create a list of howMany random numbers each between
 		//0 and numFiles
 		for(int i=0; i<howMany; i++) {
-			r = (long) Math.floor(numFiles*Math.random());
+			r = (long) Math.floor(musicSrcMgr.getMusicSource().getNumSongs()*Math.random());
 			rands.add(r);
 		}
 		
@@ -182,37 +157,8 @@ public class FileMediaSearch implements IMediaSearch {
 			}
 		};
 		FileTraverser t = new FileTraverser();
-		t.traverse(randomFileCollector, new File(rootLocation), supportedFilesFilter);
+		t.traverse(randomFileCollector, new File(musicSrcMgr.getMusicSource().getLocation()), supportedFilesFilter);
 		return songs;
-	}
-	
-	private File findRandomFile(File rootDir) {		
-		//generate random number (r) between 1 and number of files/sub dirs
-		//if rth item is a file - return it else find random song from this root
-		waitForIndexReady();
-		File[] children = rootDir.listFiles();
-		if (children.length == 0) return null;
-		int r = (int) Math.floor(children.length*Math.random());
-		if (children[r].isDirectory()) {
-			return findRandomFile(children[r]);
-		}
-		return children[r];
-	}
-
-	private void waitForIndexReady() {
-		if (indexReady.get()) return;
-		if (indexingFuture == null) {
-			throw new IllegalStateException("Music location has to be set before searching!");
-		}
-		try {
-			FileMediaIndexedEvent indexedEvent = indexingFuture.get();
-			indexReady.set(true);
-			this.numFiles = indexedEvent.getNumMediaFiles();
-			this.rootLocation = indexedEvent.getRootLocation();
-			
-		} catch (InterruptedException | ExecutionException e1) {
-			throw new IllegalStateException("Search not ready - music location indexing failed with exception!", e1);
-		}
 	}
 
 	public void setSongInfoEditor(IAudioFileTagEditor songInfoEditor) {

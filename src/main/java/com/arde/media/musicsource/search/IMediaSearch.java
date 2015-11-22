@@ -1,4 +1,4 @@
-package com.arde.media.rmp;
+package com.arde.media.musicsource.search;
 
 import java.io.IOException;
 import java.util.Collection;

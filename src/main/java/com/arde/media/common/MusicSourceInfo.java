@@ -1,4 +1,4 @@
-package com.arde.media.musicsource;
+package com.arde.media.common;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -22,8 +22,9 @@ import com.arde.media.common.Song;
 import com.arde.media.common.impl.JavaMediaPlayer;
 import com.arde.media.common.impl.TestManagedThreadFactory;
 import com.arde.media.musicsource.MusicSourceManager;
-import com.arde.media.rmp.IMediaSearch;
-import com.arde.media.rmp.impl.FileMediaSearch;
+import com.arde.media.musicsource.search.IMediaSearch;
+import com.arde.media.musicsource.search.MusicSourceIndexed;
+import com.arde.media.musicsource.search.impl.FileMediaSearch;
 
 @RunWith(CdiRunner.class)
 @AdditionalPackages({FileMediaSearch.class, IMediaSearch.class, JavaMediaPlayer.class, TestManagedThreadFactory.class})
@@ -64,7 +65,6 @@ public class FileMediaSearchTest {
 
 	private IMediaSearch getFileMediaSearch() throws Exception {
 		
-		((FileMediaSearch) srch).setIndexingFuture(getMockIndexingFuture());
 //		Field mediaPlayerFld = srch.getClass().getDeclaredField("mediaPlayer");
 //		mediaPlayerFld.setAccessible(true);
 //		mediaPlayerFld.set(srch, getJavaMediaPlayer());
@@ -72,10 +72,10 @@ public class FileMediaSearchTest {
 //		srch.setSongInfoEditor(new AudioFileTagEditor());
 		return srch;
 	}
-	private Future<FileMediaIndexedEvent> getMockIndexingFuture() {
-		return new Future<FileMediaIndexedEvent>() {
+	private Future<MusicSourceIndexed> getMockIndexingFuture() {
+		return new Future<MusicSourceIndexed>() {
 
-			private FileMediaIndexedEvent myevent = new FileMediaIndexedEvent(ROOT_LOCATION, 15);
+			private MusicSourceIndexed myevent = new MusicSourceIndexed(15);
 
 			@Override
 			public boolean cancel(boolean mayInterruptIfRunning) {
@@ -95,13 +95,13 @@ public class FileMediaSearchTest {
 			}
 
 			@Override
-			public FileMediaIndexedEvent get() throws InterruptedException,
+			public MusicSourceIndexed get() throws InterruptedException,
 					ExecutionException {
 				return myevent;
 			}
 
 			@Override
-			public FileMediaIndexedEvent get(long timeout, TimeUnit unit)
+			public MusicSourceIndexed get(long timeout, TimeUnit unit)
 					throws InterruptedException, ExecutionException,
 					TimeoutException {
 				return myevent;

@@ -1,10 +1,22 @@
   <div id=play ng-controller="PlayController" class="col-sm-8" style="background-color:lavender;">
     <div class="row">
-       <div class="col-sm-12" id="player">
-         <img ng-click="pause()" src="images/pause.gif">
-         <img ng-click="stop()" src="images/stop.gif">
-         <img ng-click="skip()" src="images/next.gif">
-   	     <img ng-click="random()" src="images/dice.gif">
+    	<div class="col-sm-2" id="player">
+    		<div class="row">
+		       <div class="col-sm-3" id="pause">
+		         <img ng-click="pause()" src="images/pause.gif">
+		       </div>
+		       <div class="col-sm-3" id="stop">       
+		         <img ng-click="stop()" src="images/stop.gif">
+		       </div>         
+		       <div class="col-sm-3" id="next">         
+		         <img ng-click="skip()" src="images/next.gif">
+		       </div>         
+		       <div class="col-sm-3" id="dice">         
+		   	     <img ng-click="random()" src="images/dice.gif">
+		       </div>
+		    </div>
+		</div>
+       <div class="col-sm-10" id="empty">         
        </div>
     </div>
 

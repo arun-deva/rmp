@@ -1,4 +1,12 @@
-IN PROGRESS: ElasticSearch integration
+FileMediaSearchTest - mock MusicSourceManager and use it for injection
+Bug? - not going to fix now:Potential thread issue in MusicSourceManager.waitForMusicSourceReady()
+Potential bug? - what if 2 threads call updateMusicSource?
+========
+DONE: 
+Refactoring in progress - Removing indexing/future related stuff from FileMediaSearch and ElasticMediaSearch and moving to MusicSourceManager. 
+Several classes no longer used(?) can be removed: MusicSourceUpdatedEvent,MediaIndexManager,FileMediaIndexedEvent,ElasticSearchIndexedEvent 
+
+DONE: ElasticSearch integration
 	* ElasticSearchClient - wrapper for the ES client (need to implement fully)
 	* ElasticSearchIndexer - will be used for re-indexing ES from the music source dir
 	* MusicSourceController - new method for manually kicking off a reindex

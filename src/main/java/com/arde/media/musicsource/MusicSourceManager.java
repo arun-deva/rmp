@@ -7,6 +7,8 @@ import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -15,6 +17,14 @@ import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
+import com.arde.media.common.MusicSource;
+import com.arde.media.common.MusicSourceInfo;
+import com.arde.media.common.exceptions.MusicSourceNotSetException;
+import com.arde.media.musicsource.search.IMediaIndexer;
+import com.arde.media.musicsource.search.MediaSearchQualifier;
+import com.arde.media.musicsource.search.MediaSearchType;
+import com.arde.media.musicsource.search.MusicSourceIndexed;
 
 @ApplicationScoped
 /**
@@ -25,9 +35,14 @@ import javax.naming.NamingException;
  */
 public class MusicSourceManager implements IMusicSourceManager {
 	public static final String MUSIC_SOURCE_JNDI_NAME = "rmp/musicSource";
+	
 	@Inject
-	private Event<MusicSourceUpdatedEvent> musicSourceUpdatedEvent;
+	@MediaSearchQualifier(MediaSearchType.ELASTICSEARCH)
+	IMediaIndexer indexer;
+	
 	private MusicSource musicSource;
+
+	private Future<MusicSourceIndexed> indexingFuture;
 
 	@PostConstruct
 	private void initMusicSource() {
@@ -35,8 +50,7 @@ public class MusicSourceManager implements IMusicSourceManager {
 			InitialContext ctx = new InitialContext();
 			String location = (String) ctx.lookup(MUSIC_SOURCE_JNDI_NAME);
 			musicSource = new MusicSource(location);
-			musicSourceUpdatedEvent.fire(new MusicSourceUpdatedEvent(musicSource));
-			
+			musicSource.setReady(true); //assume already indexed when music source was originally created
 		} catch (NamingException ne) {
 			System.out.println("Lookup failed for music source location!");
 			//this is ok - not an error condition since very first time, music source will be empty
@@ -52,12 +66,38 @@ public class MusicSourceManager implements IMusicSourceManager {
 	}
 
 	@Override
+	public void waitForMusicSourceReady() {
+		if (musicSource == null) {
+			throw new MusicSourceNotSetException("Music location is not set!");
+		}
+		if (indexingFuture == null) return; //no indexing has taken place
+		if (indexingFuture.isDone()) return; //we are not in the middle of an indexing
+		try {
+			MusicSourceIndexed indexedInfo = indexingFuture.get();
+			musicSource.setReady(true);
+			musicSource.setNumSongs(indexedInfo.getNumMediaFiles());
+		} catch (InterruptedException e1) {
+			//separate catch blocks for this and execution exception because of some JSON mapping issues (circularity due
+			//to some internal structure of the ExecutionException)
+			throw new MusicSourceNotSetException("Music location indexing interrupted! " + e1.getMessage());
+		} catch (ExecutionException e) {
+			throw new MusicSourceNotSetException("Music location indexing failed! " + e.getCause().getMessage());
+		}
+	}
+	
+	@Override
 	public void updateMusicSource(MusicSource musicSource) throws NamingException {
 		InitialContext ctx = new InitialContext();
 		Context rmpCtx = createSubContext(ctx, "rmp");
 		rmpCtx.rebind("musicSource", musicSource.getLocation());
 		this.musicSource = musicSource;
-		musicSourceUpdatedEvent.fire(new MusicSourceUpdatedEvent(musicSource));
+		musicSource.setReady(false);
+		reIndexMusicSource();
+	}
+
+	@Override
+	public void reIndexMusicSource() {
+		indexingFuture = indexer.indexMusicSource(this.musicSource);
 	}
 
 	private Context createSubContext(InitialContext ctx, String subctx) throws NamingException {

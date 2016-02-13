@@ -17,7 +17,7 @@ import com.arde.media.rmp.impl.PlayerEventQualifierFactory;
 
 @ApplicationScoped
 @MediaPlayerQualifier("Xine")
-public class NOTUSED_XineMediaPlayer implements IMediaPlayer {
+public abstract class NOTUSED_XineMediaPlayer implements IMediaPlayer {
 	XineController controller;
 	@Inject
 	private PlayerEventQualifierFactory playerEventQualifierFactory;

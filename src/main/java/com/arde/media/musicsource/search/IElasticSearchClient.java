@@ -3,11 +3,7 @@ package com.arde.media.musicsource.search;
 import java.io.IOException;
 import java.util.List;
 
-import org.elasticsearch.search.SearchHit;
-
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 public interface IElasticSearchClient {
 	public void bulkIndexDocument(String index, String type, String id, byte[] jsonDocument);
@@ -29,4 +25,6 @@ public interface IElasticSearchClient {
 			throws JsonProcessingException;
 
 	public long getCount(String indexName, String typeName);
+
+	public <T> List<T> getAll(String indexName, String typeName, Class<T> resultClass);
 }

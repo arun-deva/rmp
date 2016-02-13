@@ -15,4 +15,5 @@ public interface IMediaPlayer {
 	public void doCommand(PlayerCommand command);
 	public FileFilter getSupportedFileFilter();
 	public PlayerState getPlayerState();
+	void setPlayList(IPlayList playList);
 }

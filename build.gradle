@@ -2,18 +2,28 @@ import java.lang.invoke.LambdaForm.Compiled;
 
 import com.sun.org.apache.xalan.internal.xsltc.compiler.Include;
 
-apply plugin: 'java'
+apply plugin: 'application'
 apply plugin: 'eclipse'
 apply plugin: 'war'
 
 sourceCompatibility = 8
 version = '1.0'
-jar {
-    manifest {
-        attributes 'Implementation-Title': 'Gradle Quickstart',
-                   'Implementation-Version': version
-    }
+mainClassName='com.arde.media.web.RMP'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.9'
 }
+
+jar.doFirst {
+    manifest {
+        attributes 'Implementation-Title': 'Remote Music Player',
+                   'Implementation-Version': version,
+                   'Main-Class': 'com.arde.media.web.RMP',
+                   'Class-Path': configurations.runtime.collect { it.getName() }.join(' ')
+    }
+    
+}
+
 
 repositories {
     mavenCentral()
@@ -22,12 +32,13 @@ repositories {
 dependencies {
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
 	
-	providedCompile('javax.servlet:javax.servlet-api:3.1.0')
-	providedCompile('org.glassfish.jersey.core:jersey-server:2.17')
-	providedCompile('javax.enterprise:cdi-api:1.2')
-	providedCompile('javax.ws.rs:javax.ws.rs-api:2.0.1')
-	providedCompile('org.glassfish.jersey.media:jersey-media-json-jackson:2.17')
-	providedCompile('javax.enterprise.concurrent:javax.enterprise.concurrent-api:1.0')
+	//providedCompile('javax.servlet:javax.servlet-api:3.1.0')
+
+	//providedCompile('org.glassfish.jersey.core:jersey-server:2.17')
+	//providedCompile('javax.enterprise:cdi-api:1.2')
+	//providedCompile('javax.ws.rs:javax.ws.rs-api:2.0.1')
+	//providedCompile('org.glassfish.jersey.media:jersey-media-json-jackson:2.17')
+	//providedCompile('javax.enterprise.concurrent:javax.enterprise.concurrent-api:1.0')
 	
 	compile('org.jaudiotagger:jaudiotagger:2.0.1')
 	compile('net.java.dev.jna:jna:3.0.9')
@@ -40,6 +51,26 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.+'
     testCompile('org.jglue.cdi-unit:cdi-unit:3.1.2')
 	testRuntime files('src/main/webapp/WEB-INF')
+	
+	// Embedded Jetty
+	compile('javax.servlet:javax.servlet-api:3.1.0')
+	compile("org.glassfish.jersey.core:jersey-server:${jerseyVersion}")
+	compile('javax.enterprise:cdi-api:1.2')
+	compile('javax.ws.rs:javax.ws.rs-api:2.0.1')
+	compile("org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}")
+	compile('javax.enterprise.concurrent:javax.enterprise.concurrent-api:1.0')
+	//compile('org.eclipse.jetty:jetty-server:9.3.6.v20151106')
+	compile("org.glassfish.jersey.containers:jersey-container-servlet:${jerseyVersion}")
+	
+	compile("org.glassfish.jersey.containers:jersey-container-jetty-http:${jerseyVersion}")
+	compile("org.glassfish.jersey.ext.cdi:jersey-weld2-se:${jerseyVersion}")
+	
+	runtime("org.eclipse.jetty:jetty-jndi:${jettyVersion}")
+	runtime("org.eclipse.jetty:jetty-plus:${jettyVersion}")
+	//runtime('org.jboss.weld.servlet:weld-servlet:2.3.1.Final')
+	//runtime('org.eclipse.jetty.cdi:cdi-servlet:9.3.4.RC0')
+	//runtime('org.glassfish.extras:glassfish-embedded-web:3.2-b06')
+	
 }
 
 test {
@@ -54,6 +85,20 @@ uploadArchives {
     }
 }
 
+distributions {
+    main {
+        contents {
+            from(file("src/main/webapp")) {
+                into "lib/resources/webapp"
+            }
+        }
+    }
+}
+
+startScripts {
+    classpath += files('resources')
+}
+
 task deployToTomcat(type: Copy) {
 	from war
 	into "${tomcatHome}/webapps"
@@ -62,8 +107,18 @@ task deployToGlassfish(type: Copy) {
 	from war
 	into "${glassFishDomainHome}/autodeploy"
 }
+task rmpZip(type: Zip) {
+	from { files(jar.archivePath, configurations.runtime.fileCollection { it }) }
+}
+task runRmp(type:Exec, dependsOn: installApp) {
+     workingDir rmpBinDir
+     commandLine "${workingDir}/RMP.bat"
+} 
 deployToTomcat.dependsOn build
 deployToTomcat.mustRunAfter build
 
 deployToGlassfish.dependsOn build
 deployToGlassfish.mustRunAfter build
+
+rmpZip.dependsOn jar
+rmpZip.mustRunAfter jar

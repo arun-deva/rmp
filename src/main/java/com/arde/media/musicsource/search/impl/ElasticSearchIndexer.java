@@ -3,6 +3,7 @@ package com.arde.media.musicsource.search.impl;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,7 +20,6 @@ import com.arde.common.fileutils.filetraverse.FileTraverseEvent;
 import com.arde.common.fileutils.filetraverse.FileTraverseListener;
 import com.arde.common.fileutils.filetraverse.FileTraverser;
 import com.arde.media.common.IAudioFileTagEditor;
-import com.arde.media.common.IMediaPlayer;
 import com.arde.media.common.MusicSource;
 import com.arde.media.common.Song;
 import com.arde.media.common.SupportedMediaFilesFilter;
@@ -30,7 +30,6 @@ import com.arde.media.musicsource.search.Indexable;
 import com.arde.media.musicsource.search.MediaSearchQualifier;
 import com.arde.media.musicsource.search.MediaSearchType;
 import com.arde.media.musicsource.search.MusicSourceIndexed;
-import com.arde.media.rmp.MediaPlayerQualifier;
 import com.arde.media.rmp.MetadataChangedEventQualifier;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -127,6 +126,36 @@ public class ElasticSearchIndexer implements IMediaIndexer {
 				return s;
 			}
 		});
+	}
+
+	@Override
+	public void setSelectedMusicSource(final MusicSource musicSource) {
+		try {
+			esClient.index(ElasticSearchConstants.RMP_INDEX_NAME, ElasticSearchConstants.MUSIC_SOURCE_TYPE_NAME, 
+					new Indexable<MusicSource>() {
+
+						@Override
+						public String getKey() {
+							return musicSource.getLocation();
+						}
+
+						@Override
+						public MusicSource getEntity() {
+							return musicSource;
+						}
+					});
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Set music source failed for music source: " + musicSource, e);
+		}
+	}
+
+	@Override
+	public MusicSource getSelectedMusicSource() {
+		List<MusicSource> sources = esClient.getAll(ElasticSearchConstants.RMP_INDEX_NAME, ElasticSearchConstants.MUSIC_SOURCE_TYPE_NAME, 
+				MusicSource.class);
+		assert sources.size() <= 1;
+		if (sources.size() == 0) return null;
+		return sources.get(0);
 	}
 
 }

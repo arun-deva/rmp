@@ -4,20 +4,14 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Event;
 import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
 
 import com.arde.media.common.IMediaPlayer;
-import com.arde.media.common.IMediaQueue;
+import com.arde.media.common.IPlayList;
 import com.arde.media.common.Song;
 import com.arde.media.common.SupportedMediaFilesFilter;
 import com.arde.media.rmp.MediaPlayerQualifier;
-import com.arde.media.rmp.impl.PlayerEventQualifierFactory;
 
 @ApplicationScoped
 @MediaPlayerQualifier("Java")
@@ -25,27 +19,23 @@ public class JavaMediaPlayer implements IMediaPlayer {
 	private static Logger logger = Logger.getLogger(JavaMediaPlayer.class.getName());
 	private PlayerState playerState = PlayerState.IDLE;
 	
-	@Resource
 	/**
 	 * The resource annotation is enough for this. The only reason the Inject annotation is added is because
 	 * of unit tests - CDIRunner does not work for injecting resources, but adding hte Inject makes it work
 	 */
-	private ManagedThreadFactory managedThreadFactory; //use this to start threads so that CDI context is available to threads
+//	@Resource
+	//private ManagedThreadFactory managedThreadFactory; //use this to start threads so that CDI context is available to threads
 
 	private JavaSoundPlayer jsp;
-	
-	@Inject
-	private PlayerEventQualifierFactory playerEventQualifierFactory;
 
-	@Inject
-	private IMediaQueue mediaQueue;
-	private CdiAwarePlayCompletedListener playCompletedListener;
+	private IPlayList playList;
+//	private CdiAwarePlayCompletedListener playCompletedListener;
 	
-	@PostConstruct
+/*	@PostConstruct
 	public void startListenerThread() {
 		playCompletedListener = new CdiAwarePlayCompletedListener(this, managedThreadFactory);
 		playCompletedListener.start();
-	}
+	}*/
 	
 	public void doCommand(PlayerCommand command) {
 		logger.info("doCommand " + command + ": current player state=" + getPlayerState());
@@ -83,6 +73,7 @@ public class JavaMediaPlayer implements IMediaPlayer {
 		case STOP:
 			jsp.stop();
 			setPlayerState(PlayerState.STOPPED);
+			playList.songChanged(null);
 			break;
 		default:
 			break;
@@ -91,15 +82,14 @@ public class JavaMediaPlayer implements IMediaPlayer {
 	}
 
 	private void playNextFile() {
-		Song myMedia = mediaQueue.getNextSongToPlay();
+		Song myMedia = playList.getNextSongToPlay();
 		File myMediaFile = (myMedia != null) ? myMedia.getFile() : null;
 		if (myMediaFile != null && myMediaFile.canRead()) {
 			setPlayerState(PlayerState.PLAYING);
 
-			jsp = new JavaSoundPlayer(p -> playCompletedListener.wakeUp());
+			jsp = new JavaSoundPlayer(p -> this.doCommand(PlayerCommand.SKIP));
 			jsp.play(myMediaFile);
-			//Notify observers that we are starting to play a new file
-			notifyPlayerEvent(PlayerEventType.PLAY_STARTED, myMedia);
+			playList.songChanged(myMedia);
 		} else {
 			logger.warning("Either nothing left in queue to play, or could not open media file. Media file = " + myMediaFile);
 			//nothing to play, idle the player
@@ -132,12 +122,6 @@ public class JavaMediaPlayer implements IMediaPlayer {
 		};
 	}
 
-	private void notifyPlayerEvent(PlayerEventType event, Song myMedia) {
-		Event<Song> evt = playerEventQualifierFactory.getQualifiedPlayerEvent(event);
-		evt.fire(myMedia);
-	}
-	
-
 	@Override
 	public PlayerState getPlayerState() {
 		return playerState;
@@ -154,7 +138,7 @@ public class JavaMediaPlayer implements IMediaPlayer {
 	 * which is called by the Java sound event dispatcher thread when a line stops playing. That thread does not have the CDI context.
 	 * We need the CDI context for playing to work correctly, so we have this listener thread started using a managed thread factory waiting for such events
 	 */
-	private static class CdiAwarePlayCompletedListener {
+	/***private static class CdiAwarePlayCompletedListener {
 		private ManagedThreadFactory factory;
 		private JavaMediaPlayer mediaPlayer;
 		public CdiAwarePlayCompletedListener(JavaMediaPlayer mediaPlayer, ManagedThreadFactory factory) {
@@ -193,5 +177,10 @@ public class JavaMediaPlayer implements IMediaPlayer {
 				}
 			}).start();
 		}
+	}***/
+
+	@Override
+	public void setPlayList(IPlayList playList) {
+		this.playList = playList;
 	}
 }

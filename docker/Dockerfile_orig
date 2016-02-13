@@ -1,0 +1,19 @@
+FROM 	glassfish:4.1-jdk8
+ENV		RMP_HOME	/usr/local/apps/rmp
+ENV     PATH        $PATH:$RMP_HOME
+
+RUN		mkdir -p $RMP_HOME 
+
+COPY	rmp.war $GLASSFISH_HOME/glassfish/domains/domain1/autodeploy
+
+COPY	elasticsearch-1.7.2.zip /tmp
+RUN     unzip /tmp/elasticsearch-1.7.2.zip -d /usr/local/apps && \
+        rm -f /tmp/elasticsearch-1.7.2.zip       
+EXPOSE	9200 9300
+
+COPY	startall.sh $RMP_HOME
+RUN		chmod 755 $RMP_HOME/startall.sh
+
+CMD /usr/local/apps/rmp/startall.sh
+#Invoke using  docker run -v //c/Users/dev/SomeMusic:/music -P=true rmp 
+#That will mount /c/users/dev/SomeMusic to /music on the container. the // is needed for some Git bash issue which interprets paths wrong

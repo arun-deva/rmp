@@ -190,6 +190,15 @@ public class ElasticSearchClient implements IElasticSearchClient {
 		CountResponse resp = esClient.prepareCount(indexName).setTypes(typeName).execute().actionGet();
 		return resp.getCount();
 	}
+
+	@Override
+	public <T> List<T> getAll(String indexName, String typeName,
+			Class<T> resultClass) {
+		SearchResponse response = esClient.prepareSearch(indexName).setTypes(typeName)
+				.setQuery(QueryBuilders.queryStringQuery(("*:*")))
+				.execute().actionGet();
+		return mapToResultClass(resultClass, response.getHits().getHits());
+	}
 	
 
 }

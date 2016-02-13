@@ -1,0 +1,13 @@
+FROM resin/rpi-raspbian:wheezy
+
+ENV     JAVA_HOME   /usr/local/apps/jdk1.8.0_65
+ENV		RMP_HOME	/usr/local/apps/rmp
+ENV     PATH        $PATH:$RMP_HOME:$JAVA_HOME/bin
+
+RUN		mkdir -p $RMP_HOME 
+COPY	jdk-8u65-linux-arm32-vfp-hflt.gz /tmp
+
+RUN         tar xzf /tmp/jdk-8u65-linux-arm32-vfp-hflt.gz -C /usr/local/apps && \
+            rm -f /tmp/jdk-8u65-linux-arm32-vfp-hflt.gz
+            
+CMD ["bash"]            

@@ -54,7 +54,12 @@ public class MusicSourceController {
 	}*/
 	
 	@GET @Path("info")
-	public MusicSourceInfo getInfo() throws IOException {
-		return musicSourceMgr.getMusicSourceInfo();
+	public MusicSourceInfo getInfo() {
+		try {
+			return musicSourceMgr.getMusicSourceInfo();
+		} catch (Throwable t) {
+			t.printStackTrace();
+			throw new WebApplicationException(t);
+		}
 	}
 }

@@ -1,3 +1,8 @@
+IN PROGRESS: Using embedded Jetty - @Resource injection in JavaMediaPlayer results in null managed thread factory and causes NPE
+Approach to try - externalize the actual play list (from PlayList class) so that the code writing to it and reading from it can 
+use it as a shared area of memory (with no CDI involvement) - with that change, perhaps we can get rid of need for playcompleted listener thread
+and hence for managed thread factory?
+
 FileMediaSearchTest - mock MusicSourceManager and use it for injection
 Bug? - not going to fix now:Potential thread issue in MusicSourceManager.waitForMusicSourceReady()
 Potential bug? - what if 2 threads call updateMusicSource?

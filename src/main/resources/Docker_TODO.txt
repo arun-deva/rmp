@@ -1,0 +1,12 @@
+- Start from resin/rpi-raspbian:wheezy (this is what all of hypriot's pre-built images also use)
+- Add JDK 8
+   Notes from WLS 1213 dockerfile:
+   # (2) jdk-8u60-linux-x64.rpm Download from http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+   Alternatively, do apt-get for openjdk8 similar to the hypriot_openjdk7 dockerfile in SampleDockerfiles directory (from hypriot/rpi-java)
+- Add glassfish 4.1
+   See the glassfish4.1 dockerfile
+- Deploy our war file as part of adding glassfish 4.1
+- Add elasticsearch
+   See elasticsearch_1.7.txt in the SampleDockerfiles dir (from elasticsearch/1.7)
+   Can we just download their dockerfile and run it locally? (Answer: No, because it uses FROM java:8-jre - which means the jre image incompatible with our raspberry pi architecture will be downloaded)
+- Commands should include starting ES and Glassfish

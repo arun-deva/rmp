@@ -18,7 +18,7 @@ import com.arde.media.rmp.MediaPlayerQualifier;
 
 @ApplicationScoped
 @MediaPlayerQualifier("JMF")
-public class NOTUSED_JMFMediaPlayer implements IMediaPlayer {
+public abstract class NOTUSED_JMFMediaPlayer implements IMediaPlayer {
 	Player jPlayer;
 	Time pausedMediaTime = null;
 

@@ -14,9 +14,6 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import com.arde.media.common.MusicSource;
 import com.arde.media.common.MusicSourceInfo;
@@ -46,12 +43,8 @@ public class MusicSourceManager implements IMusicSourceManager {
 
 	@PostConstruct
 	private void initMusicSource() {
-		try {
-			InitialContext ctx = new InitialContext();
-			String location = (String) ctx.lookup(MUSIC_SOURCE_JNDI_NAME);
-			musicSource = new MusicSource(location);
-			musicSource.setReady(true); //assume already indexed when music source was originally created
-		} catch (NamingException ne) {
+		musicSource = indexer.getSelectedMusicSource();
+		if (musicSource == null) {
 			System.out.println("Lookup failed for music source location!");
 			//this is ok - not an error condition since very first time, music source will be empty
 		}
@@ -86,10 +79,8 @@ public class MusicSourceManager implements IMusicSourceManager {
 	}
 	
 	@Override
-	public void updateMusicSource(MusicSource musicSource) throws NamingException {
-		InitialContext ctx = new InitialContext();
-		Context rmpCtx = createSubContext(ctx, "rmp");
-		rmpCtx.rebind("musicSource", musicSource.getLocation());
+	public void updateMusicSource(MusicSource musicSource) {
+		indexer.setSelectedMusicSource(musicSource);
 		this.musicSource = musicSource;
 		musicSource.setReady(false);
 		reIndexMusicSource();
@@ -98,15 +89,6 @@ public class MusicSourceManager implements IMusicSourceManager {
 	@Override
 	public void reIndexMusicSource() {
 		indexingFuture = indexer.indexMusicSource(this.musicSource);
-	}
-
-	private Context createSubContext(InitialContext ctx, String subctx) throws NamingException {
-		try {
-			return (Context) ctx.lookup(subctx);
-		} catch (NamingException ne) {
-			//subctx not found, create it
-			return ctx.createSubcontext(subctx);
-		}
 	}
 
 	@Override

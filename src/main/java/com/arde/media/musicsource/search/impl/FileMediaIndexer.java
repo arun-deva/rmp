@@ -64,5 +64,15 @@ public class FileMediaIndexer implements IMediaIndexer {
 		t.traverse(counter, rootDir, srchFilter);
 		return counter.ct;
 	}
+	@Override
+	public void setSelectedMusicSource(MusicSource musicSource) {
+		// TODO Needs implementation
+		
+	}
+	@Override
+	public MusicSource getSelectedMusicSource() {
+		// TODO Needs implementation
+		return null;
+	}
 
 }

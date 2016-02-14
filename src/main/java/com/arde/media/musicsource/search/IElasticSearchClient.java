@@ -2,6 +2,7 @@ package com.arde.media.musicsource.search;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -26,5 +27,5 @@ public interface IElasticSearchClient {
 
 	public long getCount(String indexName, String typeName);
 
-	public <T> List<T> getAll(String indexName, String typeName, Class<T> resultClass);
+	public <T> Optional<List<T>> getAll(String indexName, String typeName, Class<T> resultClass);
 }

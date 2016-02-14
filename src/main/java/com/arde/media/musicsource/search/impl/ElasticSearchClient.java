@@ -3,6 +3,7 @@ package com.arde.media.musicsource.search.impl;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkProcessor;
@@ -35,14 +37,17 @@ import org.elasticsearch.search.SearchHit;
 
 import com.arde.media.musicsource.search.IElasticSearchClient;
 import com.arde.media.musicsource.search.Indexable;
+import com.arde.media.rmp.ElasticsearchNode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ApplicationScoped
 public class ElasticSearchClient implements IElasticSearchClient {
+	@Inject
+	private ElasticsearchNode esEmbeddedNode;
+	
 	private Client esClient;
 
-	private Node node;
 	private BulkProcessor bulkProcessor;
 	private static final Logger LOGGER = Logger.getLogger(ElasticSearchClient.class.getName());
 	@Override
@@ -83,11 +88,14 @@ public class ElasticSearchClient implements IElasticSearchClient {
 	}
 	
 	@Override
-	public void removeIndex(String index) {
-		boolean exists = esClient.admin().indices().prepareExists(index).execute().actionGet().isExists();
-		if (exists) {
+	public void removeIndex(String index) { 
+		if (indexExists(index)) {
 			esClient.admin().indices().delete(new DeleteIndexRequest(index)).actionGet();
 		}
+	}
+
+	private boolean indexExists(String index) {
+		return esClient.admin().indices().prepareExists(index).execute().actionGet().isExists();
 	}
 
 	@Override
@@ -141,11 +149,11 @@ public class ElasticSearchClient implements IElasticSearchClient {
 
 	@PostConstruct
 	private void initializeESClient() {
-		node = NodeBuilder.nodeBuilder()
+/*		node = NodeBuilder.nodeBuilder()
 				.settings(ImmutableSettings.settingsBuilder().put("http.enabled", false)) //ES should not open http port for this client node to listen on
 				.client(true)
-				.node();
-		esClient = node.client();
+				.node();*/
+		esClient = esEmbeddedNode.getClient();
 	}
 
 	private <T> List<T> mapToResultClass(Class<T> resultClass, SearchHit[] hits) {
@@ -155,13 +163,6 @@ public class ElasticSearchClient implements IElasticSearchClient {
 				.map(bytesToResultMapper)
 				.filter(b -> b != null)
 				.collect(Collectors.toList());
-	}
-	
-	@PreDestroy
-	private void shutdownESClientNode() {
-		if (node != null) {
-			node.close();
-		}
 	}
 	
 	private static final class ByteArrayToResultMapper<T> implements
@@ -192,12 +193,17 @@ public class ElasticSearchClient implements IElasticSearchClient {
 	}
 
 	@Override
-	public <T> List<T> getAll(String indexName, String typeName,
+	public <T> Optional<List<T>> getAll(String indexName, String typeName,
 			Class<T> resultClass) {
-		SearchResponse response = esClient.prepareSearch(indexName).setTypes(typeName)
-				.setQuery(QueryBuilders.queryStringQuery(("*:*")))
-				.execute().actionGet();
-		return mapToResultClass(resultClass, response.getHits().getHits());
+		if (indexExists(indexName)) {
+			SearchResponse response = esClient.prepareSearch(indexName).setTypes(typeName)
+					.setQuery(QueryBuilders.queryStringQuery(("*:*")))
+					.execute().actionGet();
+			SearchHit[] hits = response.getHits().getHits();
+			if (hits.length == 0) return Optional.empty();
+			return Optional.of(mapToResultClass(resultClass, hits));
+		}
+		return Optional.empty();
 	}
 	
 

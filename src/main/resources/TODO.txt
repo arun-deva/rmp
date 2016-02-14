@@ -1,4 +1,6 @@
-IN PROGRESS: Using embedded Jetty - @Resource injection in JavaMediaPlayer results in null managed thread factory and causes NPE
+TODO: Write about how we used Jersey with embedded Jetty and separate serving static resources and Jersey resources etc.
+DONE: Using embedded Elasticsearch
+DONE: Using embedded Jetty - @Resource injection in JavaMediaPlayer results in null managed thread factory and causes NPE
 Approach to try - externalize the actual play list (from PlayList class) so that the code writing to it and reading from it can 
 use it as a shared area of memory (with no CDI involvement) - with that change, perhaps we can get rid of need for playcompleted listener thread
 and hence for managed thread factory?

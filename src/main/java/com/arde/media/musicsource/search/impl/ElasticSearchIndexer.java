@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -150,12 +151,14 @@ public class ElasticSearchIndexer implements IMediaIndexer {
 	}
 
 	@Override
-	public MusicSource getSelectedMusicSource() {
-		List<MusicSource> sources = esClient.getAll(ElasticSearchConstants.RMP_INDEX_NAME, ElasticSearchConstants.MUSIC_SOURCE_TYPE_NAME, 
+	public Optional<MusicSource> getSelectedMusicSource() {
+		Optional<List<MusicSource>> sources = esClient.getAll(
+				ElasticSearchConstants.RMP_INDEX_NAME,
+				ElasticSearchConstants.MUSIC_SOURCE_TYPE_NAME, 
 				MusicSource.class);
-		assert sources.size() <= 1;
-		if (sources.size() == 0) return null;
-		return sources.get(0);
+		if (!sources.isPresent()) return Optional.empty();
+		assert sources.get().size() <= 1;
+		return Optional.of(sources.get().get(0));
 	}
 
 }

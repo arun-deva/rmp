@@ -7,6 +7,7 @@ import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -43,8 +44,9 @@ public class MusicSourceManager implements IMusicSourceManager {
 
 	@PostConstruct
 	private void initMusicSource() {
-		musicSource = indexer.getSelectedMusicSource();
-		if (musicSource == null) {
+		Optional<MusicSource> optMs = indexer.getSelectedMusicSource();
+		if (optMs.isPresent()) musicSource = optMs.get();
+		else {
 			System.out.println("Lookup failed for music source location!");
 			//this is ok - not an error condition since very first time, music source will be empty
 		}

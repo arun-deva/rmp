@@ -2,6 +2,7 @@ package com.arde.media.musicsource.search.impl;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -70,9 +71,9 @@ public class FileMediaIndexer implements IMediaIndexer {
 		
 	}
 	@Override
-	public MusicSource getSelectedMusicSource() {
+	public Optional<MusicSource> getSelectedMusicSource() {
 		// TODO Needs implementation
-		return null;
+		return Optional.empty();
 	}
 
 }

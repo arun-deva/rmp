@@ -1,5 +1,9 @@
 - Start from resin/rpi-raspbian:wheezy (this is what all of hypriot's pre-built images also use)
 - Add JDK 8
+- Unzip jar file and RUN the sh file
+- Need to make audio work by passing the device to docker container from host
+
+OLD TODO:
    Notes from WLS 1213 dockerfile:
    # (2) jdk-8u60-linux-x64.rpm Download from http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
    Alternatively, do apt-get for openjdk8 similar to the hypriot_openjdk7 dockerfile in SampleDockerfiles directory (from hypriot/rpi-java)

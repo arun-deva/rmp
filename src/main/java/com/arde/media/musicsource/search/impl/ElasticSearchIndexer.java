@@ -63,6 +63,8 @@ public class ElasticSearchIndexer implements IMediaIndexer {
 			@Override
 			public MusicSourceIndexed call() throws Exception {
 				long numSongs = buildElasticSearchIndex(musicSource);
+				setSelectedMusicSource(musicSource);
+				musicSource.setReady(true);
 				return new MusicSourceIndexed(numSongs);
 			}
 		};

@@ -82,7 +82,7 @@ public class MusicSourceManager implements IMusicSourceManager {
 	
 	@Override
 	public void updateMusicSource(MusicSource musicSource) {
-		indexer.setSelectedMusicSource(musicSource);
+		if (musicSource.equals(this.musicSource)) return;
 		this.musicSource = musicSource;
 		musicSource.setReady(false);
 		reIndexMusicSource();

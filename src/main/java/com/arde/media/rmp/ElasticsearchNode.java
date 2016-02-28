@@ -5,6 +5,8 @@ import java.io.File;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Initialized;
+import javax.enterprise.event.Observes;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -20,8 +22,12 @@ public class ElasticsearchNode {
 	
 	private Node esNode;
 	
-	@PostConstruct
-	private void createEsNode() {
+
+	/**
+	 * When application scope is initialized, go ahead and create the ES Node
+	 * @param init
+	 */
+	private void createEsNode(@Observes @Initialized(ApplicationScoped.class) Object init) {
 		File dataDir = new File(DATA_PATH);
 		if (!dataDir.isDirectory())	dataDir.mkdirs();
 		
@@ -30,7 +36,7 @@ public class ElasticsearchNode {
 
 		settingsBuilder.put("node.name", NODE_NAME);
 		settingsBuilder.put("path.data", DATA_PATH);
-		settingsBuilder.put("http.enabled", false);
+		settingsBuilder.put("http.enabled", true);
 
 		Settings settings = settingsBuilder.build();
 
